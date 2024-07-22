@@ -23,13 +23,13 @@ const page = () => {
   const theme = useTheme();
   const session = useSession();
   const [activeItem, setActiveItem] = useState("Photos");
-  const [employeeData, setEmployeeData] = useState([]);
+  const [employeeData, setEmployeeData] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pagesCount, setPagesCount] = useState(0);
   const [dataCount, setDataCount] = useState(0);
   const [type, setType] = useState("none");
   const [search, setSearch] = useState("");
-  const [completeData, setcompleteData] = useState([]);
+  const [completeData, setcompleteData] = useState<any[]>([]);
 
   const checkCondition = (type: any, id: any) => {
     if (
