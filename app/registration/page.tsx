@@ -1,15 +1,17 @@
 "use client";
 import React, { useLayoutEffect, useState } from "react";
-import type { RootState } from "../lib/store";
+import type { RootState } from "../../lib/store";
 import { useSelector, useDispatch } from "react-redux";
-import { setEmail, setPass, setisLogin } from "../lib/features/profileSlicer";
+import {
+  setEmail,
+  setPass,
+  setisLogin,
+} from "../../lib/features/profileSlicer";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import { useSession, signIn } from "next-auth/react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
-import GoogleIcon from "@mui/icons-material/Google";
-import discord from "../utilits/icon/icons8-discord-48.png";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -20,20 +22,19 @@ import { InputLabel } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Container from "@mui/material/Container";
-import image1 from "../utilits/img/image1.png";
-import image2 from "../utilits/img/image2.png";
-import image3 from "../utilits/img/image3.png";
-import image4 from "../utilits/img/image4.png";
-import image5 from "../utilits/img/image5.png";
+import image1 from "../../utilits/img/image1.png";
+import image2 from "../../utilits/img/image2.png";
+import image3 from "../../utilits/img/image3.png";
+import image4 from "../../utilits/img/image4.png";
+import image5 from "../../utilits/img/image5.png";
 
 YupPassword(yup);
 const validationSchema = yup.object({
   email: yup.string().email().required("Email is required"),
   password: yup.string().password().required("Password is required"),
+  name: yup.string().required("Name is required"),
 });
 export default function Counter() {
-  const email = useSelector((state: RootState) => state.profileReducer.email);
-  const pass = useSelector((state: RootState) => state.profileReducer.password);
   const [passvisi, setPassvisi] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -51,6 +52,7 @@ export default function Counter() {
     initialValues: {
       email: "",
       password: "",
+      name: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -83,23 +85,23 @@ export default function Counter() {
     marginLeft: "3.2rem",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))
-        ? "12rem"
-        : "10rem",
+      (formik.touched.password && Boolean(formik.errors.password))||(formik.touched.name && Boolean(formik.errors.name))
+        ? "20rem"
+        : "16rem",
   };
   const GridMainInputInner1 = {
     borderBottom: "1px solid #D7D7D7",
-    width: "100%",
+    width: "8vw",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))
+      (formik.touched.password && Boolean(formik.errors.password))||(formik.touched.name && Boolean(formik.errors.name))
         ? "5.8rem"
-        : "4.8rem",
+        : "5rem",
     marginTop: ".2rem",
   };
 
   const passwordVisibility = {
-    color: "#8697B4",
+    color: "#8697B4",   
     fontSize: "19px",
     marginRight: ".3rem",
     cursor: "pointer",
@@ -137,7 +139,7 @@ export default function Counter() {
             spacing={2}
           >
             <Grid item xs={12} sx={{ margin: "4.5rem" }}>
-              <Typography variant="h1"> Welcome to FewerClicks!</Typography>
+              <Typography variant="h1"> Register to FewerClicks!</Typography>
             </Grid>
             <form onSubmit={formik.handleSubmit}>
               <Grid
@@ -156,6 +158,30 @@ export default function Counter() {
                   spacing={2}
                   sx={GridMainInput}
                 >
+                  {" "}
+                  <Grid item xs={12} sx={GridMainInputInner1}>
+                    <TextField
+                      id="filled-name"
+                      label="Name"
+                      name="name"
+                      InputLabelProps={{
+                        shrink: true,
+                        style: { color: "#8697B4", fontSize: "16px" },
+                      }}
+                      variant="standard"
+                      InputProps={{
+                        disableUnderline: true,
+                        style: InputProps,
+                      }}
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      error={
+                        formik.touched.name && Boolean(formik.errors.name)
+                      }
+                      helperText={formik.touched.name && formik.errors.name}
+                      sx={{ marginLeft: "1.3rem", width: "89%" }}
+                    />
+                  </Grid>
                   <Grid item xs={12} sx={GridMainInputInner1}>
                     <TextField
                       id="filled-email"
@@ -244,15 +270,7 @@ export default function Counter() {
                       <Checkbox onChange={formik.handleChange} size="small" />
                       Remember me
                     </Typography>
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        color: `${theme.palette.primary.main}`,
-                        marginTop: "4px",
-                      }}
-                    >
-                      Forgot Password?
-                    </Typography>
+                    
                   </Box>
                 </Grid>
                 <Grid
@@ -275,90 +293,9 @@ export default function Counter() {
                     }}
                   >
                     <Typography variant="body1" sx={{ color: "#FFFFFF" }}>
-                      Log in
+                      Sign Up
                     </Typography>
                   </Button>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  justifyContent="center"
-                  alignItems="center"
-                  sx={{
-                    textAlign: "center",
-                    marginTop: "1rem",
-                    marginLeft: "1.5rem",
-                    color: theme.palette.secondary.main,
-                  }}
-                >
-                  <Typography variant="h2">Or Login with</Typography>
-                </Grid>
-                <Grid
-                  item
-                  xs={4}
-                  sx={{
-                    marginLeft: "11rem",
-                    textAlign: "center",
-                    borderRadius: "20px",
-                    marginTop: ".3rem",
-                  }}
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Button
-                    onClick={() => signIn("google")}
-                    sx={{ color: "black" }}
-                  >
-                    <GoogleIcon sx={{ fontSize: 25 }} />
-                  </Button>
-                  <Button
-                    onClick={() => signIn("discord")}
-                    sx={{ color: "black" }}
-                  >
-                    <Box
-                      sx={{
-                        backgroundImage: `url(${discord.src})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        width: 36,
-                        height: 36,
-                      }}
-                    />
-                  </Button>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    marginRight: "2rem",
-                    marginTop: "1rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: theme.palette.secondary.main,
-                      fontSize: "15px",
-                    }}
-                  >
-                    Don't have an account{" "}
-                  </Typography>
-                  <Box
-                    onClick={() => router.push("/registration")}
-                    sx={{
-                      color: "#257ded",
-                      marginLeft: ".3rem",
-                      fontSize: "15px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Sign Up
-                  </Box>
                 </Grid>
               </Grid>
             </form>

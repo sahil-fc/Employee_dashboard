@@ -10,13 +10,19 @@ import {
 } from "@mui/material";
 import { Grid } from "@mui/material";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { useSession } from "next-auth/react";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { signOut, useSession } from "next-auth/react";
 import { Search } from "@mui/icons-material";
 import axios from "axios";
 import ImageCard from "../components/Card";
+import { relative } from "path";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { setisLogin } from "@/lib/features/profileSlicer";
 
 const pageLimit = 7;
 const page = () => {
@@ -30,6 +36,18 @@ const page = () => {
   const [type, setType] = useState("none");
   const [search, setSearch] = useState("");
   const [completeData, setcompleteData] = useState<any[]>([]);
+  const [dropdown,setdropdown]=useState(false)
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const isLogin = useSelector(
+    (state: RootState) => state.profileReducer.isLogin
+  );
+
+  async function handleLogout(){
+    const data= await signOut({redirect:true,callbackUrl:"/"})
+    dispatch(setisLogin(false))
+    console.log(isLogin)
+  }
 
   const checkCondition = (type: any, id: any) => {
     if (
@@ -63,13 +81,17 @@ const page = () => {
       const temp = completeData.filter(
         (itr) => itr.username.slice(0, search.length) === search
       );
-      setEmployeeData(
-        temp.slice(
-          currentPage * pageLimit,
-          currentPage * pageLimit + pageLimit + 1
-        )
-      );
-    }else{
+      if (temp.length < currentPage * pageLimit) {
+        setEmployeeData(temp.slice(0, pageLimit + 1));
+      } else {
+        setEmployeeData(
+          temp.slice(
+            currentPage * pageLimit,
+            currentPage * pageLimit + pageLimit + 1
+          )
+        );
+      }
+    } else {
       setEmployeeData(
         completeData.slice(
           currentPage * pageLimit,
@@ -77,7 +99,7 @@ const page = () => {
         )
       );
     }
-  }, [search]);
+  }, [search, currentPage]);
   const handletypeChange = (e: any) => {
     setType(e.target.value);
   };
@@ -204,11 +226,17 @@ const page = () => {
                 display="flex"
                 textAlign="end"
                 alignItems={"center"}
+                sx={{position:"relative"}}
+                onClick = {()=>setdropdown(!dropdown)}
               >
                 {session.data?.user?.name
                   ? session.data?.user?.name
                   : "Sahil Khan"}{" "}
-                <KeyboardArrowDownIcon />{" "}
+                  {dropdown?<KeyboardArrowUpIcon/>:<KeyboardArrowDownIcon /> }
+                
+                <ul style={{display: dropdown?"block":"none",position:"absolute",bottom:"-30px",left:"27px",listStyle:"none"}}>
+                  <Button onClick={handleLogout} >Logout</Button>
+                </ul>
               </Grid>
             </Grid>
             {/* **************** Header End **************** */}
