@@ -1,0 +1,18 @@
+.nav{
+    display:  flex;
+    width: 100vw;
+    justify-content: space-between;
+    background-color: rgb(40, 40, 69);
+}
+.ul{
+    display: flex;
+    justify-content: flex-end;
+    width: 80vw;
+    margin-left: 1vw;
+    margin-right: 6vw;
+}
+.li{
+    margin: 1vw;
+    list-style: none;
+    cursor: pointer;
+}
