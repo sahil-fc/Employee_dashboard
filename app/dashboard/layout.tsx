@@ -3,7 +3,6 @@ import React, { useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/lib/store";
-import { NavBar } from "../components/navbar";
 
 export default function RootLayout({
   children,
@@ -23,7 +22,6 @@ export default function RootLayout({
   return (
     <>
     {children}
-    <NavBar/>
     </>
   );
 }
