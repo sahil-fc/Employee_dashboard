@@ -1,5 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import counterReducer from '../lib/features/counter/counterSlice'
 import profileReducer from '../lib/features/profileSlicer'
 import {
   persistStore,
@@ -13,7 +12,7 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
 
-const rootReducer = combineReducers({profileReducer,counterReducer});
+const rootReducer = combineReducers({profileReducer});
 
 const persistConfig = {
   key: 'root',

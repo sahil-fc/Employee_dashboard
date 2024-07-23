@@ -1,16 +1,12 @@
 "use client";
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 const inter = Inter({ subsets: ["latin"] });
-import { NavBar } from "./components/navbar";
 import { ThemeProvider } from "@emotion/react";
 import { theme } from "./theme";
-import { SessionProvider, useSession } from "next-auth/react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
-import { useRouter } from "next/router";
+import { SessionProvider } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children
@@ -24,7 +20,8 @@ export default function RootLayout({
         {/* Wrap the entire content with SessionProvider */}
         <SessionProvider >
           <StoreProvider>
-            <ThemeProvider theme={theme}>{children}</ThemeProvider>
+            <ThemeProvider theme={theme}>
+            <Toaster position="top-center" />{children}</ThemeProvider>
           </StoreProvider>
         </SessionProvider>
       </body>

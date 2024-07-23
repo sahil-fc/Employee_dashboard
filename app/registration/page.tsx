@@ -4,7 +4,7 @@ import type { RootState } from "../../lib/store";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setEmail,
-  setPass,
+  setToken,
   setisLogin,
 } from "../../lib/features/profileSlicer";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,6 @@ import Button from "@mui/material/Button";
 import { Checkbox, colors, Grid, styled, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
-import { InputLabel } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Container from "@mui/material/Container";
@@ -28,6 +27,8 @@ import image3 from "../../utilits/img/image3.png";
 import image4 from "../../utilits/img/image4.png";
 import image5 from "../../utilits/img/image5.png";
 import { Padding } from "@mui/icons-material";
+import axios from "axios";
+import { notify,failure} from "@/utilits/toasts/toast";
 
 YupPassword(yup);
 const validationSchema = yup.object({
@@ -36,8 +37,6 @@ const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
 });
 export default function Counter() {
-  const email = useSelector((state: RootState) => state.profileReducer.email);
-  const pass = useSelector((state: RootState) => state.profileReducer.password);
   const [passvisi, setPassvisi] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -46,6 +45,10 @@ export default function Counter() {
   const isLogin = useSelector(
     (state: RootState) => state.profileReducer.isLogin
   );
+  const token = useSelector(
+    (state: RootState) => state.profileReducer.token
+  );
+
   useLayoutEffect(() => {
     if (isLogin) {
       router.push("/dashboard");
@@ -59,16 +62,20 @@ export default function Counter() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      if (
-        values.email === "sah.kha18@gmail.com" &&
-        values.password === "Sahil@0786"
-      ) {
-        dispatch(setisLogin(true));
-        dispatch(setEmail(values.email));
-        dispatch(setPass(values.password));
-        router.push("/dashboard");
-      } else {
-        alert("credential are invalid ");
+      try {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/userregister`,values)
+        if(response.data.status===201){
+          dispatch(setToken(response.data.token))
+          dispatch(setEmail(response.data.email))
+          dispatch(setisLogin(true))
+          notify("login successfully")
+          router.push('/dashboard')
+        }else{
+          failure(response.data.msg)
+        }
+        
+      } catch (error) {
+        alert("try after some time")
       }
       formik.resetForm();
     },
@@ -116,11 +123,7 @@ export default function Counter() {
     // alignItems: "center",
     backgroundColor: "#ffffff",
   };
-  useLayoutEffect(() => {
-    if (session.status === "authenticated") {
-      dispatch(setisLogin(true));
-    }
-  }, [session.status]);
+
 
   return (
     <Container disableGutters maxWidth={false} sx={mainBox}>
@@ -181,6 +184,7 @@ export default function Counter() {
                       }}
                       value={formik.values.name}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       error={
                         formik.touched.name && Boolean(formik.errors.name)
                       }
@@ -204,6 +208,7 @@ export default function Counter() {
                       }}
                       value={formik.values.email}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       error={
                         formik.touched.email && Boolean(formik.errors.email)
                       }
@@ -251,6 +256,7 @@ export default function Counter() {
                         ),
                       }}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       error={
                         formik.touched.password &&
                         Boolean(formik.errors.password)

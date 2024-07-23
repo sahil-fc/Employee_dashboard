@@ -18,12 +18,11 @@ import { signOut, useSession } from "next-auth/react";
 import { Search } from "@mui/icons-material";
 import axios from "axios";
 import ImageCard from "../components/Card";
-import { relative } from "path";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
-import { setisLogin } from "@/lib/features/profileSlicer";
-
+import { setisLogin, setToken } from "@/lib/features/profileSlicer";
+import { notify} from "@/utilits/toasts/toast";
 const pageLimit = 7;
 const page = () => {
   const theme = useTheme();
@@ -42,11 +41,11 @@ const page = () => {
   const isLogin = useSelector(
     (state: RootState) => state.profileReducer.isLogin
   );
-
   async function handleLogout(){
+    notify("logout Successfully")
+    dispatch(setToken(""))
     const data= await signOut({redirect:true,callbackUrl:"/"})
     dispatch(setisLogin(false))
-    console.log(isLogin)
   }
 
   const checkCondition = (type: any, id: any) => {
@@ -106,7 +105,9 @@ const page = () => {
   const handlesearchChange = (e: any) => {
     setSearch(e.target.value);
   };
-
+  const token = useSelector(
+    (state: RootState) => state.profileReducer.token
+  );
   return (
     <>
       <Grid

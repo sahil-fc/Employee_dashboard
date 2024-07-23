@@ -14,7 +14,6 @@ export default function RootLayout({
     (state: RootState) => state.profileReducer.isLogin
   );
   useLayoutEffect(() => {
-    console.log(isLogin)  
     if (!isLogin) {
       router.push("/");
     }
