@@ -27,6 +27,7 @@ import image2 from "../../utilits/img/image2.png";
 import image3 from "../../utilits/img/image3.png";
 import image4 from "../../utilits/img/image4.png";
 import image5 from "../../utilits/img/image5.png";
+import { Padding } from "@mui/icons-material";
 
 YupPassword(yup);
 const validationSchema = yup.object({
@@ -35,6 +36,8 @@ const validationSchema = yup.object({
   name: yup.string().required("Name is required"),
 });
 export default function Counter() {
+  const email = useSelector((state: RootState) => state.profileReducer.email);
+  const pass = useSelector((state: RootState) => state.profileReducer.password);
   const [passvisi, setPassvisi] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -52,7 +55,7 @@ export default function Counter() {
     initialValues: {
       email: "",
       password: "",
-      name: "",
+      name:""
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -82,26 +85,25 @@ export default function Counter() {
   const GridMainInput = {
     boxShadow: "0px 10px 30px 0px #A9A9A940",
     borderRadius: "35px",
-    marginLeft: "3.2rem",
+    marginLeft: "2.6rem",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))||(formik.touched.name && Boolean(formik.errors.name))
-        ? "20rem"
-        : "16rem",
+      (formik.touched.password && Boolean(formik.errors.password))
+        ? "19rem"
+        : "15rem",
   };
   const GridMainInputInner1 = {
     borderBottom: "1px solid #D7D7D7",
-    width: "8vw",
+    width: "6vw",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))||(formik.touched.name && Boolean(formik.errors.name))
+      (formik.touched.password && Boolean(formik.errors.password))
         ? "5.8rem"
-        : "5rem",
-    marginTop: ".2rem",
+        : "4.8rem",
   };
 
   const passwordVisibility = {
-    color: "#8697B4",   
+    color: "#8697B4",
     fontSize: "19px",
     marginRight: ".3rem",
     cursor: "pointer",
@@ -111,7 +113,7 @@ export default function Counter() {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#ffffff",
   };
   useLayoutEffect(() => {
@@ -128,17 +130,21 @@ export default function Counter() {
           width: "100vw",
           height: " 100vh",
           justifyContent: { xs: "center", lg: "", md: "center" },
+          padding:"8vh 10vw",
+          
         }}
       >
-        <Grid item xs={12} lg={5} md={12}>
+        <Grid container lg={12} sx={{boxShadow: "0px 20px 30px 0px #A9A9A940",}}>
+        <Grid item xs={12} lg={5} md={12} sx={{height:"100%"}}>
           <Grid
             container
             direction="row"
             justifyContent="center"
             alignItems="center"
             spacing={2}
+            sx={{height:"95%"}}
           >
-            <Grid item xs={12} sx={{ margin: "4.5rem" }}>
+             <Grid item xs={12} sx={{ margin: "1rem" }}>
               <Typography variant="h1"> Register to FewerClicks!</Typography>
             </Grid>
             <form onSubmit={formik.handleSubmit}>
@@ -149,7 +155,7 @@ export default function Counter() {
                 lg={12}
                 sx={{ height: "auto", marginTop: "1.2rem" }}
               >
-                <Grid
+                   <Grid
                   container
                   item
                   xs={10}
@@ -256,23 +262,7 @@ export default function Counter() {
                     />
                   </Grid>
                 </Grid>
-                <Grid item xs={10} sx={{ marginLeft: "3.4rem" }}>
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        color: `${theme.palette.secondary.main}`,
-                        marginLeft: ".1rem",
-                      }}
-                    >
-                      <Checkbox onChange={formik.handleChange} size="small" />
-                      Remember me
-                    </Typography>
-                    
-                  </Box>
-                </Grid>
+               
                 <Grid
                   item
                   xs={10}
@@ -322,9 +312,9 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "172px",
-              height: "172px",
-              top: "4rem",
+              width: "155px",
+              height: "155px",
+              top: "7rem",
               left: "45rem",
             }}
           />
@@ -336,10 +326,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "158px",
-              height: "158px",
-              top: "3rem",
-              left: "78rem",
+              width: "141px",
+              height: "141px",
+              top: "6rem",
+              left: "73rem",
             }}
           />
           <Box
@@ -350,10 +340,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "200px",
-              height: "200px",
-              top: "23rem",
-              left: "46rem",
+              width: "175px",
+              height: "175px",
+              top: "26rem",
+              left: "45rem",
             }}
           />
           <Box
@@ -364,10 +354,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "139px",
-              height: "139px",
-              top: "16rem",
-              left: "65rem",
+              width: "122px",
+              height: "122px",
+              top: "18rem",
+              left: "62rem",
             }}
           />
           <Box
@@ -378,19 +368,20 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "136px",
-              height: "136px",
-              top: "32rem",
-              left: "78rem",
+              width: "121px",
+              height: "121px",
+              top: "34rem",
+              left: "73rem",
             }}
           />
-          <Grid item lg={8} sx={{ marginLeft: "3rem", marginBottom: "3rem" }}>
+          <Grid item lg={7} sx={{ marginLeft: "3rem", marginBottom: "3rem" }}>
             {" "}
             <Typography variant="body2">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit.
               Cupiditate minus minima consectetur.
             </Typography>
           </Grid>
+        </Grid>
         </Grid>
       </Grid>
     </Container>

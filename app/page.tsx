@@ -13,7 +13,7 @@ import discord from "../utilits/icon/icons8-discord-48.png";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Checkbox, colors, Grid, styled, Typography } from "@mui/material";
+import { Checkbox, colors, Grid, IconButton, styled, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { InputLabel } from "@mui/material";
@@ -25,6 +25,8 @@ import image2 from "../utilits/img/image2.png";
 import image3 from "../utilits/img/image3.png";
 import image4 from "../utilits/img/image4.png";
 import image5 from "../utilits/img/image5.png";
+import { Padding } from "@mui/icons-material";
+import shadows from "@mui/material/styles/shadows";
 
 YupPassword(yup);
 const validationSchema = yup.object({
@@ -80,7 +82,7 @@ export default function Counter() {
   const GridMainInput = {
     boxShadow: "0px 10px 30px 0px #A9A9A940",
     borderRadius: "35px",
-    marginLeft: "3.2rem",
+    marginLeft: "2.6rem",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
       (formik.touched.password && Boolean(formik.errors.password))
@@ -109,7 +111,7 @@ export default function Counter() {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#ffffff",
   };
   useLayoutEffect(() => {
@@ -126,17 +128,21 @@ export default function Counter() {
           width: "100vw",
           height: " 100vh",
           justifyContent: { xs: "center", lg: "", md: "center" },
+          padding:"8vh 10vw",
+          
         }}
       >
-        <Grid item xs={12} lg={5} md={12}>
+        <Grid container lg={12} sx={{boxShadow: "0px 20px 30px 0px #A9A9A940",}}>
+        <Grid item xs={12} lg={5} md={12} sx={{height:"100%"}}>
           <Grid
             container
             direction="row"
             justifyContent="center"
             alignItems="center"
             spacing={2}
+            sx={{height:"100%"}}
           >
-            <Grid item xs={12} sx={{ margin: "4.5rem" }}>
+            <Grid item xs={12} sx={{ margin: "1rem" }}>
               <Typography variant="h1"> Welcome to FewerClicks!</Typography>
             </Grid>
             <form onSubmit={formik.handleSubmit}>
@@ -241,14 +247,16 @@ export default function Counter() {
                         marginLeft: ".1rem",
                       }}
                     >
-                      <Checkbox onChange={formik.handleChange} size="small" />
+                      <Checkbox onChange={formik.handleChange} sx={{"& .MuiSvgIcon-root":{
+                        width:".7em"
+                      }}} />
                       Remember me
                     </Typography>
                     <Typography
                       variant="h3"
                       sx={{
                         color: `${theme.palette.primary.main}`,
-                        marginTop: "4px",
+                        marginTop: "10px",
                       }}
                     >
                       Forgot Password?
@@ -287,7 +295,7 @@ export default function Counter() {
                   sx={{
                     textAlign: "center",
                     marginTop: "1rem",
-                    marginLeft: "1.5rem",
+                    marginLeft: "1.3rem",
                     color: theme.palette.secondary.main,
                   }}
                 >
@@ -295,23 +303,23 @@ export default function Counter() {
                 </Grid>
                 <Grid
                   item
-                  xs={4}
+                  xs={12}
                   sx={{
-                    marginLeft: "11rem",
                     textAlign: "center",
                     borderRadius: "20px",
                     marginTop: ".3rem",
+                    marginLeft:"1rem"
                   }}
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Button
-                    onClick={() => signIn("google")}
+                  <IconButton
+                    onClick={() => signIn("google")}  
                     sx={{ color: "black" }}
                   >
                     <GoogleIcon sx={{ fontSize: 25 }} />
-                  </Button>
-                  <Button
+                  </IconButton>
+                  <IconButton
                     onClick={() => signIn("discord")}
                     sx={{ color: "black" }}
                   >
@@ -322,21 +330,21 @@ export default function Counter() {
                         backgroundPosition: "center",
                         borderRadius: "50%",
                         overflow: "hidden",
-                        width: 36,
-                        height: 36,
+                        width: 30,
+                        height: 30,
                       }}
                     />
-                  </Button>
+                  </IconButton>
                 </Grid>
                 <Grid
                   item
                   xs={12}
                   sx={{
-                    marginRight: "2rem",
+                    marginLeft: "2rem",
                     marginTop: "1rem",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "flex-end",
+                    justifyContent: "center",
                   }}
                 >
                   <Typography
@@ -385,9 +393,9 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "172px",
-              height: "172px",
-              top: "4rem",
+              width: "155px",
+              height: "155px",
+              top: "7rem",
               left: "45rem",
             }}
           />
@@ -399,10 +407,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "158px",
-              height: "158px",
-              top: "3rem",
-              left: "78rem",
+              width: "141px",
+              height: "141px",
+              top: "6rem",
+              left: "73rem",
             }}
           />
           <Box
@@ -413,10 +421,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "200px",
-              height: "200px",
-              top: "23rem",
-              left: "46rem",
+              width: "175px",
+              height: "175px",
+              top: "26rem",
+              left: "45rem",
             }}
           />
           <Box
@@ -427,10 +435,10 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "139px",
-              height: "139px",
-              top: "16rem",
-              left: "65rem",
+              width: "122px",
+              height: "122px",
+              top: "18rem",
+              left: "62rem",
             }}
           />
           <Box
@@ -441,19 +449,20 @@ export default function Counter() {
               backgroundPosition: "center",
               borderRadius: "50%",
               overflow: "hidden",
-              width: "136px",
-              height: "136px",
-              top: "32rem",
-              left: "78rem",
+              width: "121px",
+              height: "121px",
+              top: "34rem",
+              left: "73rem",
             }}
           />
-          <Grid item lg={8} sx={{ marginLeft: "3rem", marginBottom: "3rem" }}>
+          <Grid item lg={7} sx={{ marginLeft: "3rem", marginBottom: "3rem" }}>
             {" "}
             <Typography variant="body2">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit.
               Cupiditate minus minima consectetur.
             </Typography>
           </Grid>
+        </Grid>
         </Grid>
       </Grid>
     </Container>
