@@ -4,6 +4,7 @@ import type { RootState } from "../lib/store";
 import { useSelector, useDispatch } from "react-redux";
 import {
   setEmail,
+  setName,
   setToken,
   setisLogin,
 } from "../lib/features/profileSlicer";
@@ -17,12 +18,7 @@ import discord from "../utilits/icon/icons8-discord-48.png";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import {
-  Checkbox,
-  Grid,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Checkbox, Grid, IconButton, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -34,34 +30,41 @@ import image3 from "../utilits/img/image3.png";
 import image4 from "../utilits/img/image4.png";
 import image5 from "../utilits/img/image5.png";
 import axios from "axios";
-import { notify,failure } from "@/utilits/toasts/toast";
+import { notify, failure } from "@/utilits/toasts/toast";
 
-YupPassword(yup);
+YupPassword(yup); // for password validation
 const validationSchema = yup.object({
   email: yup.string().email().required("Email is required"),
   password: yup.string().password().required("Password is required"),
 });
+
 export default function Counter() {
-  const [passvisi, setPassvisi] = useState(false);
+  const [passvisi, setPassvisi] = useState(false); // password icon
   const router = useRouter();
   const dispatch = useDispatch();
   const theme = useTheme();
   const session = useSession();
   const isLogin = useSelector(
     (state: RootState) => state.profileReducer.isLogin
-  );  
+  );
+
+  /* **************** API Call for Google and Discord auth start **************** */
 
   const apicall = async (name: any, email: any) => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/nextauth`, {
-        name: name,
-        email: email,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/nextauth`,
+        {
+          name: name,
+          email: email,
+        }
+      );
       if (response.data.status === 201) {
         dispatch(setToken(response.data.token));
-        dispatch(setEmail(response.data.email));
+        dispatch(setEmail(response.data.user.email));
+        dispatch(setName(response.data.user.name));
         dispatch(setisLogin(true));
-        notify("login Successfully")
+        notify("login Successfully");
         router.push("/dashboard");
       } else {
         alert(response.data.msg);
@@ -71,19 +74,22 @@ export default function Counter() {
     }
   };
   useLayoutEffect(() => {
-    if (isLogin) {
-      router.push("/dashboard");
-    }
-  }, [isLogin]);
-
-  useLayoutEffect(() => {
-    console.log(session);
     if (session.status === "authenticated") {
       const name = session.data.user?.name;
       const email = session.data.user?.email;
       apicall(name, email);
     }
   }, [session.status]);
+
+  /* **************** API Call for Google and Discord auth end **************** */
+
+  useLayoutEffect(() => {
+    if (isLogin) {
+      router.push("/dashboard");
+    }
+  }, [isLogin]);
+
+  /* **************** formik form handling start **************** */
 
   const formik = useFormik({
     initialValues: {
@@ -93,17 +99,19 @@ export default function Counter() {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/userlogin`,
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/userlogin`,
           values
         );
         if (response.data.status === 201) {
           dispatch(setToken(response.data.token));
-          dispatch(setEmail(response.data.data.email));
+          dispatch(setEmail(response.data.user.email));
+          dispatch(setName(response.data.user.name));
           dispatch(setisLogin(true));
-          notify("login Successfuly")
+          notify("login Successfuly");
           router.push("/dashboard");
         } else {
-          failure(response.data.msg)
+          failure(response.data.msg);
         }
       } catch (error) {
         console.log(error);
@@ -111,6 +119,10 @@ export default function Counter() {
       formik.resetForm();
     },
   });
+
+  /* **************** formik form handling end **************** */
+
+  /* **************** form textfield design css object start **************** */
   const InputProps = {
     color: `${theme.palette.secondary.main}`,
     fontFamily: "League Spartan, sans-serif",
@@ -140,7 +152,7 @@ export default function Counter() {
         : "4.8rem",
     marginTop: ".2rem",
   };
-
+  /* **************** form textfield design css object end **************** */
   const passwordVisibility = {
     color: "#8697B4",
     fontSize: "19px",
@@ -173,6 +185,7 @@ export default function Counter() {
           sx={{ boxShadow: "0px 20px 30px 0px #A9A9A940" }}
         >
           <Grid item xs={12} lg={5} md={12} sx={{ height: "100%" }}>
+            {/* **************** left side box start **************** */}
             <Grid
               container
               direction="row"
@@ -185,6 +198,7 @@ export default function Counter() {
                 <Typography variant="h1"> Welcome to FewerClicks!</Typography>
               </Grid>
               <form onSubmit={formik.handleSubmit}>
+                {/* **************** Complete Form start **************** */}
                 <Grid
                   item
                   xs={11}
@@ -192,6 +206,7 @@ export default function Counter() {
                   lg={12}
                   sx={{ height: "auto", marginTop: "1.2rem" }}
                 >
+                  {/* **************** TextField start **************** */}
                   <Grid
                     container
                     item
@@ -202,6 +217,8 @@ export default function Counter() {
                     sx={GridMainInput}
                   >
                     <Grid item xs={12} sx={GridMainInputInner1}>
+                      {/* **************** Email field start **************** */}
+
                       <TextField
                         id="filled-email"
                         label="Email"
@@ -224,8 +241,10 @@ export default function Counter() {
                         helperText={formik.touched.email && formik.errors.email}
                         sx={{ marginLeft: "1.3rem", width: "89%" }}
                       />
+                      {/* **************** Email field end **************** */}
                     </Grid>
                     <Grid item xs={12} sx={{ height: "4.8rem" }}>
+                      {/* **************** Password field start **************** */}
                       <label
                         htmlFor="filled-password"
                         style={{ color: "#8697B4" }}
@@ -275,8 +294,12 @@ export default function Counter() {
                         }
                         sx={{ width: "89%" }}
                       />
+                      {/* **************** Password field end **************** */}
                     </Grid>
                   </Grid>
+                  {/* **************** TextField end **************** */}
+
+                  {/* **************** Remember me and forgot password start **************** */}
                   <Grid item xs={10} sx={{ marginLeft: "3.4rem" }}>
                     <Box
                       sx={{ display: "flex", justifyContent: "space-between" }}
@@ -309,6 +332,9 @@ export default function Counter() {
                       </Typography>
                     </Box>
                   </Grid>
+                  {/* **************** Remember me and forgot password end **************** */}
+
+                  {/* **************** Login button start **************** */}
                   <Grid
                     item
                     xs={10}
@@ -333,6 +359,9 @@ export default function Counter() {
                       </Typography>
                     </Button>
                   </Grid>
+                  {/* **************** Login button end **************** */}
+
+                  {/* **************** Google and Discord auth start **************** */}
                   <Grid
                     item
                     xs={12}
@@ -382,6 +411,10 @@ export default function Counter() {
                       />
                     </IconButton>
                   </Grid>
+                  {/* **************** Google and Discord auth end **************** */}
+
+                  {/* **************** Sign up start **************** */}
+
                   <Grid
                     item
                     xs={12}
@@ -414,11 +447,14 @@ export default function Counter() {
                       Sign Up
                     </Box>
                   </Grid>
+                  {/* **************** Sign up end **************** */}
                 </Grid>
+                {/* **************** Complete Form end **************** */}
               </form>
             </Grid>
+            {/* **************** left side box end **************** */}
           </Grid>
-
+          {/* **************** Right Side box start **************** */}
           <Grid
             item
             xs={0}
@@ -431,76 +467,12 @@ export default function Counter() {
             }}
             alignItems="flex-end"
           >
-            <Box
-              sx={{
-                position: "absolute",
-                backgroundImage: `url(${image1.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                width: "155px",
-                height: "155px",
-                top: "7rem",
-                left: "45rem",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                backgroundImage: `url(${image3.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                width: "141px",
-                height: "141px",
-                top: "6rem",
-                left: "73rem",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                backgroundImage: `url(${image4.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                width: "175px",
-                height: "175px",
-                top: "26rem",
-                left: "45rem",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                backgroundImage: `url(${image2.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                width: "122px",
-                height: "122px",
-                top: "18rem",
-                left: "62rem",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                backgroundImage: `url(${image5.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                borderRadius: "50%",
-                overflow: "hidden",
-                width: "121px",
-                height: "121px",
-                top: "34rem",
-                left: "73rem",
-              }}
-            />
+            <Box sx={ImageStyle(image1.src, "155px", "7rem", "45rem")} />
+            <Box sx={ImageStyle(image2.src, "121px", "18rem", "62rem")} />
+            <Box sx={ImageStyle(image3.src, "141px", "6rem", "73rem")} />
+            <Box sx={ImageStyle(image4.src, "175px", "26rem", "45rem")} />
+            <Box sx={ImageStyle(image5.src, "121px", "34rem", "73rem")} />
+
             <Grid item lg={7} sx={{ marginLeft: "3rem", marginBottom: "3rem" }}>
               {" "}
               <Typography variant="body2">
@@ -509,12 +481,28 @@ export default function Counter() {
               </Typography>
             </Grid>
           </Grid>
+          {/* **************** Right Side box end **************** */}
         </Grid>
       </Grid>
     </Container>
   );
 }
 
-const ImageStyle = (image: any, position: any) => {
-  return;
-};
+{
+  /* **************** Right side image design  start **************** */
+}
+export const ImageStyle = (image: any, size: any, top: any, left: any) => ({
+  position: "absolute",
+  backgroundImage: `url(${image})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  borderRadius: "50%",
+  overflow: "hidden",
+  width: size,
+  height: size,
+  top: top,
+  left: left,
+});
+{
+  /* **************** Right side image design  end **************** */
+}

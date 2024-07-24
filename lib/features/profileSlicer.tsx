@@ -6,12 +6,14 @@ export interface ProfileState {
   email: string;
   isLogin: boolean;
   token:string;
+  name:string;
 }
 
 const initialState: ProfileState = {
   email: "",
   isLogin: false,
-  token:""
+  token:"",
+  name:""
 };
 
 export const profileSlice = createSlice({
@@ -20,6 +22,9 @@ export const profileSlice = createSlice({
   reducers: {
     setEmail: (state, action: PayloadAction<string>) => {
       state.email = action.payload;
+    },
+    setName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload;
     },
     setisLogin: (state,action: PayloadAction<boolean>) => {
       if(action.payload===false){
@@ -34,6 +39,6 @@ export const profileSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setEmail, setisLogin,setToken } = profileSlice.actions;
+export const { setEmail, setisLogin,setToken,setName } = profileSlice.actions;
 
 export default profileSlice.reducer;

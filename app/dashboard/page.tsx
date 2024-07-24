@@ -41,6 +41,9 @@ const page = () => {
   const isLogin = useSelector(
     (state: RootState) => state.profileReducer.isLogin
   );
+  const name = useSelector(
+    (state: RootState) => state.profileReducer.name
+  );
   async function handleLogout(){
     notify("logout Successfully")
     dispatch(setToken(""))
@@ -230,9 +233,7 @@ const page = () => {
                 sx={{position:"relative"}}
                 onClick = {()=>setdropdown(!dropdown)}
               >
-                {session.data?.user?.name
-                  ? session.data?.user?.name
-                  : "Sahil Khan"}{" "}
+                {name}{" "}
                   {dropdown?<KeyboardArrowUpIcon/>:<KeyboardArrowDownIcon /> }
                 
                 <ul style={{display: dropdown?"block":"none",position:"absolute",bottom:"-30px",left:"27px",listStyle:"none"}}>
