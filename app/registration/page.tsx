@@ -31,6 +31,7 @@ import { Padding } from "@mui/icons-material";
 import axios from "axios";
 import { notify, failure } from "@/utilits/toasts/toast";
 import { ImageStyle } from "../page";
+import { useGetRegisterMutation } from "../Services/userService";
 
 YupPassword(yup); // for password validation
 const validationSchema = yup.object({
@@ -45,9 +46,10 @@ export default function Counter() {
   const theme = useTheme();
   const session = useSession();
   const isLogin = useSelector(
-    (state: RootState) => state.profileReducer.isLogin
+    (state: RootState) => state.profile.isLogin
   );
-  const token = useSelector((state: RootState) => state.profileReducer.token);
+  const token = useSelector((state: RootState) => state.profile.token);
+  const [getRegister,{isError}] = useGetRegisterMutation();
 
   useLayoutEffect(() => {
     if (isLogin) {
@@ -64,23 +66,17 @@ export default function Counter() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/userregister`,
-          values
-        );
-        if (response.data.status === 201) {
-          dispatch(setToken(response.data.token));
-          dispatch(setEmail(response.data.user.email));
-          dispatch(setName(response.data.user.name))
-          dispatch(setisLogin(true));
-          notify("login successfully");
-          router.push("/dashboard");
-        } else {
-          failure(response.data.msg);
-        }
-      } catch (error) {
-        alert("try after some time");
+      const result = await getRegister(values).unwrap();
+      if (!isError&&result.status===201) {
+        console.log(result.user)
+        dispatch(setToken(result.token));
+        dispatch(setEmail(result.user.email));
+        dispatch(setName(result.user.name));
+        dispatch(setisLogin(true));
+        notify("login Successfuly");
+        router.push("/dashboard");
+      }else{
+        failure(result.msg)
       }
       formik.resetForm();
     },

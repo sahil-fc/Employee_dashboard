@@ -3,6 +3,7 @@ import React, { useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/lib/store";
+import { useGetLoginMutation } from "../Services/userService";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,7 @@ export default function RootLayout({
 }>) {
   const router = useRouter();
   const isLogin = useSelector(
-    (state: RootState) => state.profileReducer.isLogin
+    (state: RootState) => state.profile.isLogin
   );
   useLayoutEffect(() => {
     if (!isLogin) {
@@ -20,6 +21,7 @@ export default function RootLayout({
   }, [isLogin]);
   return (
     <>
+
     {children}
     </>
   );

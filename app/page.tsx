@@ -31,6 +31,10 @@ import image4 from "../utilits/img/image4.png";
 import image5 from "../utilits/img/image5.png";
 import axios from "axios";
 import { notify, failure } from "@/utilits/toasts/toast";
+import {
+  useGetLoginMutation,
+  useGetNextAuthMutation,
+} from "./Services/userService";
 
 YupPassword(yup); // for password validation
 const validationSchema = yup.object({
@@ -44,33 +48,46 @@ export default function Counter() {
   const dispatch = useDispatch();
   const theme = useTheme();
   const session = useSession();
-  const isLogin = useSelector(
-    (state: RootState) => state.profileReducer.isLogin
-  );
+  const isLogin = useSelector((state: RootState) => state.profile.isLogin);
+  const [getLogin, { data, isLoading, isError, error }] = useGetLoginMutation();
+  const [getNext] = useGetNextAuthMutation();
 
   /* **************** API Call for Google and Discord auth start **************** */
 
   const apicall = async (name: any, email: any) => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/nextauth`,
-        {
-          name: name,
-          email: email,
-        }
-      );
-      if (response.data.status === 201) {
-        dispatch(setToken(response.data.token));
-        dispatch(setEmail(response.data.user.email));
-        dispatch(setName(response.data.user.name));
-        dispatch(setisLogin(true));
-        notify("login Successfully");
-        router.push("/dashboard");
-      } else {
-        alert(response.data.msg);
-      }
-    } catch (error) {
-      console.log(error);
+    // try {
+    //   const response = await axios.post(
+    //     `${process.env.NEXT_PUBLIC_BASE_URL}/nextauth`,
+    //     {
+    //       name: name,
+    //       email: email,
+    //     }
+    //   );
+    //   if (response.data.status === 201) {
+    //     dispatch(setToken(response.data.token));
+    //     dispatch(setEmail(response.data.user.email));
+    //     dispatch(setName(response.data.user.name));
+    //     dispatch(setisLogin(true));
+    //     notify("login Successfully");
+    //     router.push("/dashboard");
+    //   } else {
+    //     alert(response.data.msg);
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    getNext({ name: name, email: email })
+    console.log(data)
+    if (!isError && data?.status === 201) {
+      console.log(data.user);
+      dispatch(setToken(data.token));
+      dispatch(setEmail(data.user.email));
+      dispatch(setName(data.user.name));
+      dispatch(setisLogin(true));
+      notify("login Successfuly");
+      router.push("/dashboard");
+    } else {
+      failure(data?.msg);
     }
   };
   useLayoutEffect(() => {
@@ -90,7 +107,6 @@ export default function Counter() {
   }, [isLogin]);
 
   /* **************** formik form handling start **************** */
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -98,23 +114,36 @@ export default function Counter() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/userlogin`,
-          values
-        );
-        if (response.data.status === 201) {
-          dispatch(setToken(response.data.token));
-          dispatch(setEmail(response.data.user.email));
-          dispatch(setName(response.data.user.name));
-          dispatch(setisLogin(true));
-          notify("login Successfuly");
-          router.push("/dashboard");
-        } else {
-          failure(response.data.msg);
-        }
-      } catch (error) {
-        console.log(error);
+      // try {
+      //   const response = await axios.post(
+      //     `${process.env.NEXT_PUBLIC_BASE_URL}/userlogin`,
+      //     values
+      //   );
+      //   if (response.data.status === 201) {
+      // dispatch(setToken(response.data.token));
+      // dispatch(setEmail(response.data.user.email));
+      // dispatch(setName(response.data.user.name));
+      // dispatch(setisLogin(true));
+      // notify("login Successfuly");
+      // router.push("/dashboard");
+      //   } else {
+      //     failure(response.data.msg);
+      //   }
+      // } catch (error) {
+      //   console.log(error);
+      // }
+      const loginDetails = { email: values.email, password: values.password };
+      getLogin(loginDetails)
+      if (!isError && data?.status === 201) {
+        console.log(data.user);
+        dispatch(setToken(data.token));
+        dispatch(setEmail(data.user.email));
+        dispatch(setName(data.user.name));
+        dispatch(setisLogin(true));
+        notify("login Successfuly");
+        router.push("/dashboard");
+      } else {
+        failure(data?.msg);
       }
       formik.resetForm();
     },

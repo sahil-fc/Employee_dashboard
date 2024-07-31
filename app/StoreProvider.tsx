@@ -19,9 +19,9 @@ export default function StoreProvider({
   let persistor = persistStore(storeRef.current);
   return (
     <Provider store={storeRef.current}>
-      {/* <PersistGate persistor={persistor}> */}
+      {/* <PersistGate loading={null} persistor={persistor}> */}
         {children}
       {/* </PersistGate> */}
-    </Provider>
+     </Provider>
   );
 }

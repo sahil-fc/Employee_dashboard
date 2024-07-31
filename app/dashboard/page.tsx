@@ -39,10 +39,10 @@ const page = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const isLogin = useSelector(
-    (state: RootState) => state.profileReducer.isLogin
+    (state: RootState) => state.profile.isLogin
   );
   const name = useSelector(
-    (state: RootState) => state.profileReducer.name
+    (state: RootState) => state.profile.name
   );
   async function handleLogout(){
     notify("logout Successfully")
@@ -109,7 +109,7 @@ const page = () => {
     setSearch(e.target.value);
   };
   const token = useSelector(
-    (state: RootState) => state.profileReducer.token
+    (state: RootState) => state.profile.token
   );
   return (
     <>
