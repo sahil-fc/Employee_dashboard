@@ -1,55 +1,56 @@
 "use client";
 import React, { useLayoutEffect, useState } from "react";
-import type { RootState } from "../../lib/store";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  setEmail,
-  setName,
-  setToken,
-  setisLogin,
-} from "../../lib/features/profileSlicer";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { useSession, signIn } from "next-auth/react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Checkbox, colors, Grid, styled, Typography } from "@mui/material";
+import { Checkbox, colors, Grid, styled, Typography, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Container from "@mui/material/Container";
-import image1 from "../../utilits/img/image1.png";
-import image2 from "../../utilits/img/image2.png";
-import image3 from "../../utilits/img/image3.png";
-import image4 from "../../utilits/img/image4.png";
-import image5 from "../../utilits/img/image5.png";
+import image1 from "../../utilits/img/amzone.jpg";
+import image2 from "../../utilits/img/Flipcard.png";
+import image3 from "../../utilits/img/myntra.jpg";
+import image4 from "../../utilits/img/Snapdeal.png";
+import image5 from "../../utilits/img/meesho.png";
 import { Padding } from "@mui/icons-material";
 import axios from "axios";
 import { notify, failure } from "@/utilits/toasts/toast";
 import { ImageStyle } from "../page";
-import { useGetRegisterMutation } from "../Services/userService";
+import { userStore } from "@/lib/persistedStore";
 
 YupPassword(yup); // for password validation
 const validationSchema = yup.object({
-  email: yup.string().email().required("Email is required"),
-  password: yup.string().password().required("Password is required"),
-  name: yup.string().required("Name is required"),
+  email: yup.string().email("Invalid email format").required("Email is required"),
+  password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  companyName: yup.string().required("Company Name is required"),
+  companyCategory: yup
+    .string()
+    .oneOf(["blog", "eCommerce", "content"], "Invalid company category")
+    .required("Company Category is required"),
+  companyLogo: yup.mixed()
+    .required("Company Logo is required")
 });
+
 export default function Counter() {
   const [passvisi, setPassvisi] = useState(false); // password icon
   const router = useRouter();
-  const dispatch = useDispatch();
   const theme = useTheme();
-  const session = useSession();
-  const isLogin = useSelector(
-    (state: RootState) => state.profile.isLogin
-  );
-  const token = useSelector((state: RootState) => state.profile.token);
-  const [getRegister,{isError}] = useGetRegisterMutation();
+  const {
+    isLogin,
+    token,
+    email,
+    setIsLogin,
+    setToken,
+    setEmail,
+    setName,
+    setCompanyId,
+  } = userStore();
 
   useLayoutEffect(() => {
     if (isLogin) {
@@ -57,26 +58,51 @@ export default function Counter() {
     }
   }, [isLogin]);
   /* **************** formik form handling start **************** */
-
+  const handleLogoImageChange = (e: any) => {// Check if function is triggered
+    const file = e.target.files[0];
+    if (file) {
+      formik.setFieldValue("companyLogo", file);
+    } else {
+      console.log("No file selected");
+    }
+  };
+  
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
-      name: "",
+      companyName: "",
+      companyCategory: "E-Commerce", // Default empty or set a default value like "blog"
+      companyLogo: null,
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      const result = await getRegister(values).unwrap();
-      if (!isError&&result.status===201) {
-        console.log(result.user)
-        dispatch(setToken(result.token));
-        dispatch(setEmail(result.user.email));
-        dispatch(setName(result.user.name));
-        dispatch(setisLogin(true));
+      console.log("Form Submitted:", values);
+      const formData = new FormData();
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("companyName", values.companyName);
+      formData.append("companyCategory", values.companyCategory);
+      if (values.companyLogo) {
+        formData.append("companyLogo", values.companyLogo); // Append file if exists
+      }
+
+      // Axios request
+      const result = await axios.post("http://localhost:5001/api/companies", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Important for file uploads
+        },
+      });
+      if (result.status === 201) {
+        console.log(result.data?.user)
+        setToken(result.data?.token);
+        setEmail(result.data?.user.email);
+        setName(result.data?.user.companyName)
+        setIsLogin(true);
         notify("login Successfuly");
         router.push("/dashboard");
-      }else{
-        failure(result.msg)
+      } else {
+        failure(result.data.message)
       }
       formik.resetForm();
     },
@@ -100,16 +126,16 @@ export default function Counter() {
     marginLeft: "2.6rem",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))
-        ? "19rem"
-        : "15rem",
+        (formik.touched.password && Boolean(formik.errors.password))
+        ? "36rem"
+        : "30rem",
   };
   const GridMainInputInner1 = {
     borderBottom: "1px solid #D7D7D7",
     width: "6vw",
     height:
       (formik.touched.email && Boolean(formik.errors.email)) ||
-      (formik.touched.password && Boolean(formik.errors.password))
+        (formik.touched.password && Boolean(formik.errors.password))
         ? "5.8rem"
         : "4.8rem",
   };
@@ -159,9 +185,12 @@ export default function Counter() {
               sx={{ height: "95%" }}
             >
               <Grid item xs={12} sx={{ margin: "1rem" }}>
-                <Typography variant="h1"> Register to FewerClicks!</Typography>
+                <Typography variant="h1"> Register to CurvScout!</Typography>
               </Grid>
-              <form onSubmit={formik.handleSubmit}>
+              <form onSubmit={(e) => {
+                e.preventDefault();// Debugging step 1
+                formik.handleSubmit(e);
+              }}>
                 {/* **************** Complete Form start **************** */}
 
                 <Grid
@@ -186,9 +215,9 @@ export default function Counter() {
                     {/* **************** Name field start **************** */}
                     <Grid item xs={12} sx={GridMainInputInner1}>
                       <TextField
-                        id="filled-name"
-                        label="Name"
-                        name="name"
+                        id="filled-company-name"
+                        label="Company Name"
+                        name="companyName"
                         InputLabelProps={{
                           shrink: true,
                           style: { color: "#8697B4", fontSize: "16px" },
@@ -198,18 +227,18 @@ export default function Counter() {
                           disableUnderline: true,
                           style: InputProps,
                         }}
-                        value={formik.values.name}
+                        value={formik.values.companyName}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={
-                          formik.touched.name && Boolean(formik.errors.name)
+                          formik.touched.companyName && Boolean(formik.errors.companyName)
                         }
-                        helperText={formik.touched.name && formik.errors.name}
+                        helperText={formik.touched.companyName && formik.errors.companyName}
                         sx={{ marginLeft: "1.3rem", width: "89%" }}
                       />
                     </Grid>
-                    {/* **************** Name field end **************** */}
-                    {/* **************** Email field start **************** */}
+
+                    {/* **************** Email field **************** */}
                     <Grid item xs={12} sx={GridMainInputInner1}>
                       <TextField
                         id="filled-email"
@@ -227,23 +256,16 @@ export default function Counter() {
                         value={formik.values.email}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        error={
-                          formik.touched.email && Boolean(formik.errors.email)
-                        }
+                        error={formik.touched.email && Boolean(formik.errors.email)}
                         helperText={formik.touched.email && formik.errors.email}
                         sx={{ marginLeft: "1.3rem", width: "89%" }}
                       />
                     </Grid>
-                    {/* **************** Email field end **************** */}
-                    {/* **************** Password field start **************** */}
-                    <Grid item xs={12} sx={{ height: "4.8rem" }}>
-                      <label
-                        htmlFor="filled-password"
-                        style={{ color: "#8697B4" }}
-                      >
-                        <LockIcon
-                          sx={{ fontSize: "14px", marginRight: ".3rem" }}
-                        />
+
+                    {/* **************** Password field **************** */}
+                    <Grid item xs={12} sx={{ ...GridMainInputInner1, height: "4.8rem" }}>
+                      <label htmlFor="filled-password" style={{ color: "#8697B4" }}>
+                        <LockIcon sx={{ fontSize: "14px", marginRight: ".3rem" }} />
                       </label>
                       <TextField
                         id="filled-password"
@@ -277,17 +299,66 @@ export default function Counter() {
                         }}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        error={
-                          formik.touched.password &&
-                          Boolean(formik.errors.password)
-                        }
-                        helperText={
-                          formik.touched.password && formik.errors.password
-                        }
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
                         sx={{ width: "89%" }}
                       />
                     </Grid>
+
+                    {/* **************** Company Category Dropdown **************** */}
+                    <Grid item xs={12} sx={GridMainInputInner1}>
+                      <TextField
+                        id="filled-company-category"
+                        label="Company Category"
+                        name="companyCategory"
+                        select
+                        InputLabelProps={{
+                          shrink: true,
+                          style: { color: "#8697B4", fontSize: "16px" },
+                        }}
+                        variant="standard"
+                        InputProps={{
+                          disableUnderline: true,
+                          style: InputProps,
+                        }}
+                        value={formik.values.companyCategory}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched.companyCategory &&
+                          Boolean(formik.errors.companyCategory)
+                        }
+                        helperText={
+                          formik.touched.companyCategory && formik.errors.companyCategory
+                        }
+                        sx={{ marginLeft: "1.3rem", width: "89%" }}
+                      >
+                        <MenuItem value="blog">Blog</MenuItem>
+                        <MenuItem value="eCommerce">E-Commerce</MenuItem>
+                        <MenuItem value="content">Content</MenuItem>
+                      </TextField>
+                    </Grid>
                     {/* **************** Password field end **************** */}
+                    <Grid item xs={12} sx={GridMainInputInner1}>
+                      <label htmlFor="company-logo-upload" style={{ color: "#8697B4", fontSize: "16px" }}>
+                        Company Logo
+                      </label>
+                      <input
+                        id="company-logo-upload"
+                        name="companyLogo"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoImageChange}
+                        onBlur={formik.handleBlur}
+                        style={{ display: "block", marginTop: "0.5rem" }}
+                      />
+                      {formik.touched.companyLogo && formik.errors.companyLogo && (
+                        <Typography color="error" sx={{ fontSize: "0.875rem", marginTop: "0.2rem" }}>
+                          {formik.errors.companyLogo}
+                        </Typography>
+                      )}
+                    </Grid>
+
                   </Grid>
                   {/* **************** TextField end **************** */}
                   {/* **************** Sign Up button start **************** */}
@@ -300,7 +371,7 @@ export default function Counter() {
                       backgroundColor: `${theme.palette.primary.main}`,
                       textAlign: "center",
                       borderRadius: "20px",
-                      marginTop: "6rem",
+                      marginTop: "2rem",
                     }}
                   >
                     <Button

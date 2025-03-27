@@ -1,5 +1,5 @@
 "use client";
-import { Inter } from "next/font/google";
+import { Inter,League_Spartan } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 const inter = Inter({ subsets: ["latin"] });
@@ -7,7 +7,7 @@ import { ThemeProvider } from "@emotion/react";
 import { theme } from "./theme";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
-
+const league = League_Spartan({weight:"400",subsets:["latin"]});
 export default function RootLayout({
   children
 }: Readonly<{
@@ -16,14 +16,14 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className} style={{fontFamily:"League Spartan"}}>
+      <body className={league.className} >
         {/* Wrap the entire content with SessionProvider */}
-        <SessionProvider >
-          <StoreProvider>
+        {/* <SessionProvider > */}
+          {/* <StoreProvider> */}
             <ThemeProvider theme={theme}>
             <Toaster position="top-center" />{children}</ThemeProvider>
-          </StoreProvider>
-        </SessionProvider>
+          {/* </StoreProvider> */}
+        {/* </SessionProvider> */}
       </body>
     </html>
   );

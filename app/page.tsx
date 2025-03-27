@@ -1,16 +1,7 @@
 "use client";
 import React, { useLayoutEffect, useState } from "react";
-import type { RootState } from "../lib/store";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  setEmail,
-  setName,
-  setToken,
-  setisLogin,
-} from "../lib/features/profileSlicer";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
-import { useSession, signIn } from "next-auth/react";
 import * as yup from "yup";
 import YupPassword from "yup-password";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -24,17 +15,14 @@ import LockIcon from "@mui/icons-material/Lock";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Container from "@mui/material/Container";
-import image1 from "../utilits/img/image1.png";
-import image2 from "../utilits/img/image2.png";
-import image3 from "../utilits/img/image3.png";
-import image4 from "../utilits/img/image4.png";
-import image5 from "../utilits/img/image5.png";
+import image1 from "../utilits/img/Snapdeal.png";
+import image2 from "../utilits/img/Flipcard.png";
+import image3 from "../utilits/img/myntra.jpg";
+import image4 from "../utilits/img/meesho.png";
+import image5 from "../utilits/img/amzone.jpg";
 import axios from "axios";
 import { notify, failure } from "@/utilits/toasts/toast";
-import {
-  useGetLoginMutation,
-  useGetNextAuthMutation,
-} from "./Services/userService";
+import { userStore } from "@/lib/persistedStore";
 
 YupPassword(yup); // for password validation
 const validationSchema = yup.object({
@@ -45,61 +33,18 @@ const validationSchema = yup.object({
 export default function Counter() {
   const [passvisi, setPassvisi] = useState(false); // password icon
   const router = useRouter();
-  const dispatch = useDispatch();
   const theme = useTheme();
-  const session = useSession();
-  const isLogin = useSelector((state: RootState) => state.profile.isLogin);
-  const [getLogin, { data, isLoading, isError, error }] = useGetLoginMutation();
-  const [getNext] = useGetNextAuthMutation();
 
-  /* **************** API Call for Google and Discord auth start **************** */
-
-  const apicall = async (name: any, email: any) => {
-    // try {
-    //   const response = await axios.post(
-    //     `${process.env.NEXT_PUBLIC_BASE_URL}/nextauth`,
-    //     {
-    //       name: name,
-    //       email: email,
-    //     }
-    //   );
-    //   if (response.data.status === 201) {
-    //     dispatch(setToken(response.data.token));
-    //     dispatch(setEmail(response.data.user.email));
-    //     dispatch(setName(response.data.user.name));
-    //     dispatch(setisLogin(true));
-    //     notify("login Successfully");
-    //     router.push("/dashboard");
-    //   } else {
-    //     alert(response.data.msg);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    // }
-    getNext({ name: name, email: email })
-    console.log(data)
-    if (!isError && data?.status === 201) {
-      console.log(data.user);
-      dispatch(setToken(data.token));
-      dispatch(setEmail(data.user.email));
-      dispatch(setName(data.user.name));
-      dispatch(setisLogin(true));
-      notify("login Successfuly");
-      router.push("/dashboard");
-    } else {
-      failure(data?.msg);
-    }
-  };
-  useLayoutEffect(() => {
-    if (session.status === "authenticated") {
-      const name = session.data.user?.name;
-      const email = session.data.user?.email;
-      apicall(name, email);
-    }
-  }, [session.status]);
-
-  /* **************** API Call for Google and Discord auth end **************** */
-
+    const {
+      isLogin,
+      token,
+      email,
+      setIsLogin,
+      setToken,
+      setEmail,
+      setName
+    } = userStore();
+    
   useLayoutEffect(() => {
     if (isLogin) {
       router.push("/dashboard");
@@ -114,37 +59,24 @@ export default function Counter() {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      // try {
-      //   const response = await axios.post(
-      //     `${process.env.NEXT_PUBLIC_BASE_URL}/userlogin`,
-      //     values
-      //   );
-      //   if (response.data.status === 201) {
-      // dispatch(setToken(response.data.token));
-      // dispatch(setEmail(response.data.user.email));
-      // dispatch(setName(response.data.user.name));
-      // dispatch(setisLogin(true));
-      // notify("login Successfuly");
-      // router.push("/dashboard");
-      //   } else {
-      //     failure(response.data.msg);
-      //   }
-      // } catch (error) {
-      //   console.log(error);
-      // }
-      const loginDetails = { email: values.email, password: values.password };
-      getLogin(loginDetails)
-      if (!isError && data?.status === 201) {
-        console.log(data.user);
-        dispatch(setToken(data.token));
-        dispatch(setEmail(data.user.email));
-        dispatch(setName(data.user.name));
-        dispatch(setisLogin(true));
-        notify("login Successfuly");
-        router.push("/dashboard");
-      } else {
-        failure(data?.msg);
+      try {
+        const loginDetails = { email: values.email, password: values.password };
+  
+        const result = await axios.post("http://localhost:10000/api/companies/login", loginDetails);
+        
+        if (result.status === 200) {
+          setToken(result.data?.token);
+          setEmail(result.data?.user.email);
+          setName(result.data?.user.companyName)
+          setIsLogin(true);
+          notify("Login Successfully");
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        console.error(error);
+        failure("Invalid Credentials");
       }
+  
       formik.resetForm();
     },
   });
@@ -224,7 +156,7 @@ export default function Counter() {
               sx={{ height: "100%" }}
             >
               <Grid item xs={12} sx={{ margin: "1rem" }}>
-                <Typography variant="h1"> Welcome to FewerClicks!</Typography>
+                <Typography variant="h1"> Welcome to CurvScout!</Typography>
               </Grid>
               <form onSubmit={formik.handleSubmit}>
                 {/* **************** Complete Form start **************** */}
@@ -389,58 +321,6 @@ export default function Counter() {
                     </Button>
                   </Grid>
                   {/* **************** Login button end **************** */}
-
-                  {/* **************** Google and Discord auth start **************** */}
-                  <Grid
-                    item
-                    xs={12}
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{
-                      textAlign: "center",
-                      marginTop: "1rem",
-                      marginLeft: "1.3rem",
-                      color: theme.palette.secondary.main,
-                    }}
-                  >
-                    <Typography variant="h2">Or Login with</Typography>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{
-                      textAlign: "center",
-                      borderRadius: "20px",
-                      marginTop: ".3rem",
-                      marginLeft: "1rem",
-                    }}
-                    justifyContent="center"
-                    alignItems="center"
-                  >
-                    <IconButton
-                      onClick={() => signIn("google")}
-                      sx={{ color: "black" }}
-                    >
-                      <GoogleIcon sx={{ fontSize: 25 }} />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => signIn("discord")}
-                      sx={{ color: "black" }}
-                    >
-                      <Box
-                        sx={{
-                          backgroundImage: `url(${discord.src})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          borderRadius: "50%",
-                          overflow: "hidden",
-                          width: 30,
-                          height: 30,
-                        }}
-                      />
-                    </IconButton>
-                  </Grid>
-                  {/* **************** Google and Discord auth end **************** */}
 
                   {/* **************** Sign up start **************** */}
 
